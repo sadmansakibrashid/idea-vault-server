@@ -33,14 +33,15 @@ async function run() {
   const result = await commentCollection.insertOne(commentData);
   res.json(result);
 });
+app.get('/comments',async(req,res)=>{
+    const result = await commentCollection.find().toArray();
+    res.json(result);
+   });
 app.get("/comments/:userId", async (req, res) => {
-  const { userId } = req.params;
-
-  const result = await bookingCollection
-    .find({ userId })
-    .toArray();
-
-  res.json(result);
+  const {userId} = req.params;
+  const result = await commentCollection
+    .find({ userId: userId })
+   res.json(result);
 });
 
 app.get('/ideas',async(req,res)=>{
