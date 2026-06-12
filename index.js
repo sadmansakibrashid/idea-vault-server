@@ -25,9 +25,25 @@ async function run() {
    
    const db = client.db("idea-vault")
 
-   const ideaCollection = db.collection("idea-vault")
+   const ideaCollection = db.collection("idea-vault");
+   const commentCollection = db.collection("comments");
 
-   app.get('/ideas',async(req,res)=>{
+  app.post("/comments", async (req, res) => {
+  const commentData = req.body;
+  const result = await commentCollection.insertOne(commentData);
+  res.json(result);
+});
+app.get("/comments/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  const result = await bookingCollection
+    .find({ userId })
+    .toArray();
+
+  res.json(result);
+});
+
+app.get('/ideas',async(req,res)=>{
     const result = await ideaCollection.find().toArray();
     res.json(result);
    });
@@ -48,11 +64,15 @@ async function run() {
     app.patch("/ideas/:id",async(req,res)=>{
       const {id} = req.params
       const updatedData = req.body
-
       const result =await ideaCollection.updateOne(
         {_id: new ObjectId(id)},
         {$set: updatedData}
       )
+      res.json(result)
+    })
+    app.delete('/ideas/:id',async(req,res)=>{
+      const {id} = req.params;
+      const result = await ideaCollection.deleteOne({_id: new ObjectId(id)})
       res.json(result)
     })
 
