@@ -40,7 +40,14 @@ app.get('/comments',async(req,res)=>{
 app.get("/comments/:userId", async (req, res) => {
   const {userId} = req.params;
   const result = await commentCollection
-    .find({ userId: userId })
+    .find({ userId: userId }).toArray()
+   res.json(result);
+});
+
+app.delete("/comments/:userId", async (req, res) => {
+  const {userId} = req.params;
+  const result = await commentCollection
+    .deleteOne({_id: new ObjectId(userId)})
    res.json(result);
 });
 
