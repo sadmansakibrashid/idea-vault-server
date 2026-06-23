@@ -64,7 +64,15 @@ app.get('/ideas',async(req,res)=>{
     res.json(result)
    });
 
-    app.get("/ideas/:id",async(req,res)=>{
+    app.get("/ideas/:id",(req,res,next)=>{
+      const header = req.headers.authorization
+      if(header ==="logged in"){
+      next()
+      }else{
+        res.status(401).json({message:"Unauthorized"})
+      }
+    },
+    async(req,res)=>{
     const {id} = req.params
     const result = await ideaCollection.findOne({_id: new ObjectId(id)})
     res.json(result)
@@ -78,11 +86,37 @@ app.get('/ideas',async(req,res)=>{
       )
       res.json(result)
     })
+  app.patch("/comments/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { commentText } = req.body;
+
+    const result = await commentCollection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: { commentText },
+      }
+    );
+
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ error: "Update failed" });
+  }
+});
     app.delete('/ideas/:id',async(req,res)=>{
       const {id} = req.params;
       const result = await ideaCollection.deleteOne({_id: new ObjectId(id)})
       res.json(result)
     })
+
+   app.get('/trending-ideas', async (req, res) => {
+   const result = await ideaCollection
+    .find()
+    .limit(6)
+    .toArray();
+      res.json(result);
+});
 
 
     await client.db("admin").command({ ping: 1 });
