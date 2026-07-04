@@ -54,7 +54,7 @@ async function run() {
    const ideaCollection = db.collection("idea-vault");
    const commentCollection = db.collection("comments");
 
-  app.post("/comments", async (req, res) => {
+  app.post("/comments",verifyToken, async (req, res) => {
   const commentData = req.body;
   const result = await commentCollection.insertOne(commentData);
   res.json(result);
@@ -63,14 +63,14 @@ app.get('/comments',async(req,res)=>{
     const result = await commentCollection.find().toArray();
     res.json(result);
    });
-app.get("/comments/:userId", async (req, res) => {
+app.get("/comments/:userId",verifyToken, async (req, res) => {
   const {userId} = req.params;
   const result = await commentCollection
     .find({ userId: userId }).toArray()
    res.json(result);
 });
 
-app.delete("/comments/:userId", async (req, res) => {
+app.delete("/comments/:userId",verifyToken, async (req, res) => {
   const {userId} = req.params;
   const result = await commentCollection
     .deleteOne({_id: new ObjectId(userId)})
@@ -83,7 +83,7 @@ app.get('/ideas',async(req,res)=>{
    });
 
 
-   app.post('/ideas',async(req,res)=>{
+   app.post('/ideas',verifyToken,async(req,res)=>{
     const ideasData = req.body
     console.log(ideasData)
     const result =await ideaCollection.insertOne(ideasData)
@@ -96,7 +96,7 @@ app.get('/ideas',async(req,res)=>{
     const result = await ideaCollection.findOne({_id: new ObjectId(id)})
     res.json(result)
  })
-    app.patch("/ideas/:id",async(req,res)=>{
+    app.patch("/ideas/:id",verifyToken,async(req,res)=>{
       const {id} = req.params
       const updatedData = req.body
       const result =await ideaCollection.updateOne(
@@ -105,7 +105,7 @@ app.get('/ideas',async(req,res)=>{
       )
       res.json(result)
     })
-  app.patch("/comments/:id", async (req, res) => {
+  app.patch("/comments/:id",verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
     const { commentText } = req.body;
